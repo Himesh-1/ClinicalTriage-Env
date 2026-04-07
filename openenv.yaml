@@ -1,0 +1,20 @@
+name: ClinicalTriage-Env
+version: 1.0.0
+description: >
+  RL environment for AI-powered emergency room patient triage using ESI scale.
+  Agent receives patient vitals and must output ESI priority level 1–5.
+author: your-hf-username
+license: MIT
+tasks:
+  - name: single_patient_easy
+    difficulty: easy
+    description: Triage a single patient with complete, unambiguous vitals
+  - name: concurrent_patients_medium
+    difficulty: medium
+    description: Rank 5 concurrent patients by triage priority
+  - name: incomplete_vitals_hard
+    difficulty: hard
+    description: Triage with missing data and time-decay reward
+action_space: TriageAction
+observation_space: PatientObservation
+reward_range: [0.0, 1.0]
