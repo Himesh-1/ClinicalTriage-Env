@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clinicaltriage-env"
+version = "1.0.0"
+description = "RL environment for AI-powered emergency room patient triage using ESI scale."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "numpy",
+    "httpx",
+    "openai",
+    "python-dotenv",
+    "pyyaml"
+]
