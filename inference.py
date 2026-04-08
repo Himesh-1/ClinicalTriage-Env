@@ -25,11 +25,15 @@ load_dotenv()
 # ─────────────────────────────────────────────────────────────────────────────
 #  Configuration — all from env vars as required
 # ─────────────────────────────────────────────────────────────────────────────
+API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
+
 client = OpenAI(
-    base_url=os.environ["API_BASE_URL"],
-    api_key=os.environ["HF_TOKEN"],
+    base_url=API_BASE_URL,
+    api_key=API_KEY,
 )
-MODEL = os.environ["MODEL_NAME"]
+MODEL = MODEL_NAME
 
 # The OpenEnv server base URL — defaults to localhost for local testing
 ENV_BASE_URL = os.environ.get("ENV_BASE_URL", "http://localhost:7860")
