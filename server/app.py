@@ -244,7 +244,7 @@ def step(body: StepRequest):
             # Reveal complete vitals
             updated_obs = PatientSimulator.reveal_vitals(raw)
             s["current_observations"][0] = updated_obs
-            reward = 0.0  # No reward for requesting vitals
+            reward = 0.001  # No reward for requesting vitals (strictly bounded)
             done = False
             info["action_type"] = "request_vitals"
             info["vitals_revealed"] = True

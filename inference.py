@@ -325,7 +325,8 @@ def run_easy_episode(ep_num: int, session_id: str) -> tuple:
             observation = result["observation"]
 
     success = total_reward > 0.0
-    log_end(success=success, steps=step, score=total_reward, rewards=rewards)
+    score = min(max(total_reward, 0.001), 0.999)
+    log_end(success=success, steps=step, score=score, rewards=rewards)
     return total_reward, step
 
 
@@ -358,7 +359,8 @@ def run_medium_episode(ep_num: int, session_id: str) -> tuple:
     log_step(step=step, action=action_json, reward=reward, done=done, error=None)
 
     success = total_reward > 0.0
-    log_end(success=success, steps=step, score=total_reward, rewards=rewards)
+    score = min(max(total_reward, 0.001), 0.999)
+    log_end(success=success, steps=step, score=score, rewards=rewards)
     return total_reward, step
 
 
@@ -391,7 +393,7 @@ def run_hard_episode(ep_num: int, session_id: str) -> tuple:
             observation = result["observation"]
 
     success = total_reward > 0.0
-    score = min(max(total_reward, 0.0), 1.0)
+    score = min(max(total_reward, 0.001), 0.999)
     log_end(success=success, steps=step, score=score, rewards=rewards)
     return total_reward, step
 

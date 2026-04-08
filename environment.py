@@ -421,7 +421,7 @@ class ESIGrader:
 
         # BUG FIX: Use addition instead of Python `or` on floats
         raw_reward = exact + proximity + reasoning_score - step_penalty
-        return round(max(0.0, min(1.0, raw_reward)), 4)
+        return round(max(0.001, min(0.999, raw_reward)), 4)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -437,7 +437,7 @@ def kendall_tau_reward(agent_ranking: list, ground_truth_ranking: list) -> float
     """
     n = len(ground_truth_ranking)
     if n == 0:
-        return 0.0
+        return 0.001
 
     # Map ground truth IDs to positions
     gt_pos = {pid: i for i, pid in enumerate(ground_truth_ranking)}
@@ -446,10 +446,10 @@ def kendall_tau_reward(agent_ranking: list, ground_truth_ranking: list) -> float
     try:
         agent_pos = [gt_pos[pid] for pid in agent_ranking if pid in gt_pos]
     except KeyError:
-        return 0.0
+        return 0.001
 
     if len(agent_pos) != n:
-        return 0.0
+        return 0.001
 
     # Count concordant and discordant pairs
     concordant = 0
@@ -463,8 +463,9 @@ def kendall_tau_reward(agent_ranking: list, ground_truth_ranking: list) -> float
 
     total_pairs = n * (n - 1) / 2
     if total_pairs == 0:
-        return 1.0
+        return 0.999
 
     tau = (concordant - discordant) / total_pairs
     # Normalise from [-1, 1] → [0, 1]
-    return round((tau + 1) / 2, 4)
+    raw_reward = (tau + 1) / 2
+    return round(max(0.001, min(0.999, raw_reward)), 4)
