@@ -1,0 +1,267 @@
+{
+  "name": "concurrent_patients_medium",
+  "difficulty": "medium",
+  "description": "Rank 5 concurrent patients by triage priority",
+  "max_steps": 1,
+  "patient_sets": [
+    {
+      "profiles": [
+        {
+          "patient_id": "MA01",
+          "age": 70,
+          "heart_rate": 38,
+          "blood_pressure_systolic": 70,
+          "blood_pressure_diastolic": 40,
+          "oxygen_saturation": 85.0,
+          "respiratory_rate": 32,
+          "temperature": 35.5,
+          "pain_scale": 10,
+          "chief_complaint": "Unresponsive, brought in by family, gurgling sounds",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 1
+        },
+        {
+          "patient_id": "MA02",
+          "age": 55,
+          "heart_rate": 112,
+          "blood_pressure_systolic": 90,
+          "blood_pressure_diastolic": 60,
+          "oxygen_saturation": 92.0,
+          "respiratory_rate": 24,
+          "temperature": 39.8,
+          "pain_scale": 8,
+          "chief_complaint": "High fever, confusion, rigors, suspected sepsis",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 2
+        },
+        {
+          "patient_id": "MA03",
+          "age": 40,
+          "heart_rate": 95,
+          "blood_pressure_systolic": 135,
+          "blood_pressure_diastolic": 88,
+          "oxygen_saturation": 95.0,
+          "respiratory_rate": 20,
+          "temperature": 38.2,
+          "pain_scale": 6,
+          "chief_complaint": "Abdominal pain, nausea, vomiting since morning",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 3
+        },
+        {
+          "patient_id": "MA04",
+          "age": 18,
+          "heart_rate": 78,
+          "blood_pressure_systolic": 120,
+          "blood_pressure_diastolic": 78,
+          "oxygen_saturation": 98.0,
+          "respiratory_rate": 16,
+          "temperature": 37.4,
+          "pain_scale": 4,
+          "chief_complaint": "Twisted ankle playing cricket, mild swelling",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 4
+        },
+        {
+          "patient_id": "MA05",
+          "age": 35,
+          "heart_rate": 70,
+          "blood_pressure_systolic": 118,
+          "blood_pressure_diastolic": 76,
+          "oxygen_saturation": 99.0,
+          "respiratory_rate": 15,
+          "temperature": 36.9,
+          "pain_scale": 1,
+          "chief_complaint": "Mild cold symptoms, runny nose, no fever",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 5
+        }
+      ],
+      "ground_truth_ranking": [
+        "MA01",
+        "MA02",
+        "MA03",
+        "MA04",
+        "MA05"
+      ]
+    },
+    {
+      "profiles": [
+        {
+          "patient_id": "MB01",
+          "age": 50,
+          "heart_rate": 140,
+          "blood_pressure_systolic": 65,
+          "blood_pressure_diastolic": 35,
+          "oxygen_saturation": 80.0,
+          "respiratory_rate": 36,
+          "temperature": 36.0,
+          "pain_scale": 10,
+          "chief_complaint": "Motorcycle crash, massive bleeding from leg, pale and confused",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 1
+        },
+        {
+          "patient_id": "MB02",
+          "age": 68,
+          "heart_rate": 48,
+          "blood_pressure_systolic": 170,
+          "blood_pressure_diastolic": 100,
+          "oxygen_saturation": 93.0,
+          "respiratory_rate": 18,
+          "temperature": 37.0,
+          "pain_scale": 6,
+          "chief_complaint": "Sudden left-sided weakness, slurred speech started 1 hour ago",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 2
+        },
+        {
+          "patient_id": "MB03",
+          "age": 33,
+          "heart_rate": 90,
+          "blood_pressure_systolic": 128,
+          "blood_pressure_diastolic": 82,
+          "oxygen_saturation": 97.0,
+          "respiratory_rate": 18,
+          "temperature": 37.8,
+          "pain_scale": 7,
+          "chief_complaint": "Fell from ladder, right arm deformed, severe pain",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 3
+        },
+        {
+          "patient_id": "MB04",
+          "age": 25,
+          "heart_rate": 72,
+          "blood_pressure_systolic": 115,
+          "blood_pressure_diastolic": 75,
+          "oxygen_saturation": 99.0,
+          "respiratory_rate": 14,
+          "temperature": 38.0,
+          "pain_scale": 3,
+          "chief_complaint": "Sore throat for 3 days, difficulty swallowing, mild fever",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 4
+        },
+        {
+          "patient_id": "MB05",
+          "age": 42,
+          "heart_rate": 68,
+          "blood_pressure_systolic": 122,
+          "blood_pressure_diastolic": 78,
+          "oxygen_saturation": 99.0,
+          "respiratory_rate": 15,
+          "temperature": 36.8,
+          "pain_scale": 0,
+          "chief_complaint": "Needs medical certificate for work, no complaints",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 5
+        }
+      ],
+      "ground_truth_ranking": [
+        "MB01",
+        "MB02",
+        "MB03",
+        "MB04",
+        "MB05"
+      ]
+    },
+    {
+      "profiles": [
+        {
+          "patient_id": "MC01",
+          "age": 4,
+          "heart_rate": 170,
+          "blood_pressure_systolic": 75,
+          "blood_pressure_diastolic": 45,
+          "oxygen_saturation": 84.0,
+          "respiratory_rate": 50,
+          "temperature": 40.2,
+          "pain_scale": 10,
+          "chief_complaint": "Child seizing, high fever, eyes rolling back, started 5 min ago",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 1
+        },
+        {
+          "patient_id": "MC02",
+          "age": 30,
+          "heart_rate": 125,
+          "blood_pressure_systolic": 95,
+          "blood_pressure_diastolic": 55,
+          "oxygen_saturation": 90.0,
+          "respiratory_rate": 28,
+          "temperature": 37.0,
+          "pain_scale": 8,
+          "chief_complaint": "Severe allergic reaction to peanuts, hives all over body, wheezing",
+          "arrival_mode": "ambulance",
+          "vitals_complete": true,
+          "ground_truth_esi": 2
+        },
+        {
+          "patient_id": "MC03",
+          "age": 48,
+          "heart_rate": 85,
+          "blood_pressure_systolic": 142,
+          "blood_pressure_diastolic": 92,
+          "oxygen_saturation": 96.0,
+          "respiratory_rate": 17,
+          "temperature": 37.1,
+          "pain_scale": 7,
+          "chief_complaint": "Chest pain on exertion, resolves with rest, history of diabetes",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 3
+        },
+        {
+          "patient_id": "MC04",
+          "age": 16,
+          "heart_rate": 80,
+          "blood_pressure_systolic": 112,
+          "blood_pressure_diastolic": 72,
+          "oxygen_saturation": 99.0,
+          "respiratory_rate": 15,
+          "temperature": 37.0,
+          "pain_scale": 4,
+          "chief_complaint": "Dog bite on calf yesterday, wound looks slightly red",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 4
+        },
+        {
+          "patient_id": "MC05",
+          "age": 55,
+          "heart_rate": 72,
+          "blood_pressure_systolic": 128,
+          "blood_pressure_diastolic": 80,
+          "oxygen_saturation": 98.0,
+          "respiratory_rate": 14,
+          "temperature": 36.8,
+          "pain_scale": 1,
+          "chief_complaint": "Wants lab results reviewed, routine blood work done last week",
+          "arrival_mode": "walk-in",
+          "vitals_complete": true,
+          "ground_truth_esi": 5
+        }
+      ],
+      "ground_truth_ranking": [
+        "MC01",
+        "MC02",
+        "MC03",
+        "MC04",
+        "MC05"
+      ]
+    }
+  ],
+  "interaction_mode": "multi_patient"
+}

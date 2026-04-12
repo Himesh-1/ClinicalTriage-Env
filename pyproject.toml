@@ -1,24 +1,46 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "clinicaltriage-env"
-version = "1.0.0"
-description = "RL environment for AI-powered emergency room patient triage using ESI scale."
-readme = "README.md"
+version = "0.1.0"
+description = "OpenEnv-compatible ESI patient triage RL benchmark"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi",
-    "uvicorn",
-    "pydantic",
-    "numpy",
-    "httpx",
-    "openai",
-    "python-dotenv",
-    "pyyaml",
-    "openenv-core>=0.2.0"
+    "openenv-core>=0.1.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "websockets>=12.0",
+    "requests>=2.31.0",
 ]
 
+[project.optional-dependencies]
+eval = ["pandas>=2.0.0"]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "httpx>=0.27.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project.scripts]
-server = "server.app:main"
+clinicaltriage-env = "server.app:main"
+clinicaltriage-benchmark = "eval.benchmark:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.hatch.build]
+include = [
+  "*.py",
+  "server/",
+  "eval/",
+  "tasks/",
+]
+exclude = [
+  "venv/",
+  ".venv/",
+  "tests/",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

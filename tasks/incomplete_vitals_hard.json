@@ -1,0 +1,134 @@
+{
+  "name": "incomplete_vitals_hard",
+  "difficulty": "hard",
+  "description": "Triage with missing data and time-decay reward",
+  "max_steps": 3,
+  "patient_profiles": [
+    {
+      "patient_id": "H001",
+      "age": 42,
+      "heart_rate": 98,
+      "blood_pressure_systolic": 0,
+      "blood_pressure_diastolic": 0,
+      "oxygen_saturation": 93.0,
+      "respiratory_rate": 22,
+      "temperature": 37.1,
+      "pain_scale": 7,
+      "chief_complaint": "I have a weird discomfort in my chest since morning",
+      "arrival_mode": "walk-in",
+      "vitals_complete": false,
+      "ground_truth_esi": 2,
+      "complete_vitals": {
+        "blood_pressure_systolic": 145,
+        "blood_pressure_diastolic": 92,
+        "vitals_complete": true
+      }
+    },
+    {
+      "patient_id": "H002",
+      "age": 60,
+      "heart_rate": 0,
+      "blood_pressure_systolic": 0,
+      "blood_pressure_diastolic": 0,
+      "oxygen_saturation": 0.0,
+      "respiratory_rate": 0,
+      "temperature": 0.0,
+      "pain_scale": 9,
+      "chief_complaint": "Patient brought in by family, reportedly feeling extremely tired",
+      "arrival_mode": "ambulance",
+      "vitals_complete": false,
+      "ground_truth_esi": 1,
+      "complete_vitals": {
+        "heart_rate": 40,
+        "blood_pressure_systolic": 60,
+        "blood_pressure_diastolic": 35,
+        "oxygen_saturation": 82.0,
+        "respiratory_rate": 35,
+        "temperature": 35.0,
+        "vitals_complete": true
+      }
+    },
+    {
+      "patient_id": "H003",
+      "age": 25,
+      "heart_rate": 80,
+      "blood_pressure_systolic": 118,
+      "blood_pressure_diastolic": 76,
+      "oxygen_saturation": 0.0,
+      "respiratory_rate": 18,
+      "temperature": 39.1,
+      "pain_scale": 5,
+      "chief_complaint": "I've had a bad cough for the last few days",
+      "arrival_mode": "walk-in",
+      "vitals_complete": false,
+      "ground_truth_esi": 3,
+      "complete_vitals": {
+        "oxygen_saturation": 96.0,
+        "vitals_complete": true
+      }
+    },
+    {
+      "patient_id": "H004",
+      "age": 78,
+      "heart_rate": 55,
+      "blood_pressure_systolic": 0,
+      "blood_pressure_diastolic": 0,
+      "oxygen_saturation": 89.0,
+      "respiratory_rate": 0,
+      "temperature": 36.2,
+      "pain_scale": 4,
+      "chief_complaint": "I felt a bit dizzy when standing up this afternoon",
+      "arrival_mode": "walk-in",
+      "vitals_complete": false,
+      "ground_truth_esi": 2,
+      "complete_vitals": {
+        "blood_pressure_systolic": 88,
+        "blood_pressure_diastolic": 52,
+        "respiratory_rate": 24,
+        "vitals_complete": true
+      }
+    },
+    {
+      "patient_id": "H005",
+      "age": 34,
+      "heart_rate": 0,
+      "blood_pressure_systolic": 130,
+      "blood_pressure_diastolic": 85,
+      "oxygen_saturation": 97.0,
+      "respiratory_rate": 16,
+      "temperature": 0.0,
+      "pain_scale": 6,
+      "chief_complaint": "My stomach has been hurting since last night",
+      "arrival_mode": "walk-in",
+      "vitals_complete": false,
+      "ground_truth_esi": 3,
+      "complete_vitals": {
+        "heart_rate": 92,
+        "temperature": 38.4,
+        "vitals_complete": true
+      }
+    },
+    {
+      "patient_id": "H006",
+      "age": 5,
+      "heart_rate": 145,
+      "blood_pressure_systolic": 0,
+      "blood_pressure_diastolic": 0,
+      "oxygen_saturation": 0.0,
+      "respiratory_rate": 30,
+      "temperature": 39.5,
+      "pain_scale": 8,
+      "chief_complaint": "My child has been a bit fussy today and feels warm",
+      "arrival_mode": "ambulance",
+      "vitals_complete": false,
+      "ground_truth_esi": 2,
+      "complete_vitals": {
+        "blood_pressure_systolic": 82,
+        "blood_pressure_diastolic": 48,
+        "oxygen_saturation": 93.0,
+        "vitals_complete": true
+      }
+    }
+  ],
+  "interaction_mode": "incomplete_vitals"
+}

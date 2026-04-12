@@ -15,6 +15,44 @@ An OpenEnv-compliant reinforcement learning environment for AI-powered emergency
 
 ---
 
+## Installation
+
+```bash
+pip install clinicaltriage-env
+```
+
+## Quick start — client SDK
+
+```python
+from clinicaltriage_env import Env, Action
+import asyncio
+
+async def main():
+    async with Env(base_url="ws://localhost:7860") as env:
+        obs = await env.reset(task_name="single_patient_easy")
+        action = Action(
+            triage_level=1,
+            reasoning="Critical: SpO2 88%, BP 80/50, HR 130",
+            confidence=0.95,
+        )
+        result = await env.step(action)
+        print(f"Reward: {result.reward}, Done: {result.done}")
+
+asyncio.run(main())
+```
+
+## Evaluation harness
+
+```bash
+# Run 5 episodes per task locally (no server needed):
+python eval/benchmark.py --local --episodes 5
+
+# Run against a deployed server:
+python eval/benchmark.py --base-url ws://localhost:7860 --episodes 5
+```
+
+---
+
 ## The Problem
 
 Indian ERs handle 150M+ visits annually. A leading cause of preventable deaths is **poor triage** — the process of sorting patients by severity when they arrive. With limited staff and no clinical decision support, nurses routinely misjudge who needs attention first.
@@ -171,45 +209,19 @@ curl -X POST http://localhost:7860/step \
 - Python 3.11
 - Docker (for container testing)
 
-### 1. Create virtual environment
+### 1. Run the server
 
 ```bash
-python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# Linux/Mac
-source venv/bin/activate
+uvicorn server.app:app --host 0.0.0.0 --port 7860 --reload
 ```
 
-### 2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the server
-
-```bash
-uvicorn server:app --host 0.0.0.0 --port 7860 --reload
-```
-
-### 4. Run the inference agent
+### 2. Run the inference agent
 
 ```bash
 export API_BASE_URL="https://router.huggingface.co/v1"
 export MODEL_NAME="meta-llama/Llama-3.1-8B-Instruct"
 export HF_TOKEN="hf_your_token_here"
 python inference.py
-```
-
-### 5. Run compliance tests
-
-```bash
-# Make sure server is running first
-pytest tests/test_compliance.py -v
-
-# OR standalone
-python tests/test_compliance.py
 ```
 
 ---
@@ -232,44 +244,14 @@ docker run -p 7860:7860 \
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `API_BASE_URL` | ✓ | LLM API base URL (OpenAI-compatible) |
-| `MODEL_NAME` | ✓ | Model identifier |
-| `HF_TOKEN` | ✓ | HuggingFace token (used as API key) |
-| `ENV_BASE_URL` | Optional | OpenEnv server URL (default: `http://localhost:7860`) |
-
----
-
-## Baseline Scores
-
-Running the `inference.py` script with the `meta-llama/Llama-3.1-8B-Instruct` model yields the following reproducible baseline scores across 3 episodes per task:
-
-| Task | Avg Reward | Description |
-|---|---|---|
-| `single_patient_easy` | **0.7000** | Model correctly identifies clear ESI patterns. |
-| `concurrent_patients_medium` | **1.0000** | Model successfully ranks 5 patients by severity. |
-| `incomplete_vitals_hard` | **1.0000** | Model navigates missing data for accurate triage. |
-| **Overall Average** | **0.9000** | |
-
----
-
-## Project Structure
-
-```
-ClinicalTriage-Env/
-├── server.py              # FastAPI app — the OpenEnv server
-├── environment.py         # PatientSimulator, ESIGrader, reward logic
-├── models.py              # Pydantic models: all data types
-├── tasks.py               # Task definitions for Easy, Medium, Hard
-├── grader.py              # Per-task grader functions returning 0.0–1.0
-├── inference.py           # Baseline LLM agent (ROOT LEVEL)
-├── openenv.yaml           # OpenEnv spec file
-├── Dockerfile             # HF Spaces compatible container
-├── requirements.txt       # Python dependencies
-└── tests/
-    └── test_compliance.py # Pre-submission validation tests
-```
+| Variable         | Required | Default                          | Description                    |
+| ---------------- | -------- | -------------------------------- | ------------------------------ |
+| API_BASE_URL     | Yes      | https://router.huggingface.co/v1 | LLM API endpoint               |
+| MODEL_NAME       | Yes      | meta-llama/Llama-3.1-8B-Instruct | Model identifier               |
+| HF_TOKEN         | Yes      | none                             | HuggingFace / API key          |
+| ENV_BASE_URL     | No       | http://localhost:7860            | Running environment server URL |
+| LOCAL_IMAGE_NAME | No       | clinicaltriage-env:latest        | Docker image name              |
+| SKIP_LLM_GRADER  | No       | false                            | Skip LLM judge (local testing) |
 
 ---
 

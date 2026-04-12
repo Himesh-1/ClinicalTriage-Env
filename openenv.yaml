@@ -1,20 +1,76 @@
-name: ClinicalTriage-Env
-version: 1.0.0
-description: >
-  RL environment for AI-powered emergency room patient triage using ESI scale.
-  Agent receives patient vitals and must output ESI priority level 1–5.
-author: your-hf-username
-license: MIT
+name: clinicaltriage-env
+version: 0.1.0
+description: "ESI patient triage RL benchmark — 3 task levels, LLM-graded reasoning rewards"
+emoji: "🏥"
+tags:
+  - healthcare
+  - triage
+  - openenv
+  - reinforcement-learning
 tasks:
   - name: single_patient_easy
-    difficulty: easy
-    description: Triage a single patient with complete, unambiguous vitals
   - name: concurrent_patients_medium
-    difficulty: medium
-    description: Rank 5 concurrent patients by triage priority
   - name: incomplete_vitals_hard
-    difficulty: hard
-    description: Triage with missing data and time-decay reward
-action_space: TriageAction
-observation_space: PatientObservation
-reward_range: [0.0, 1.0]
+action_space:
+  type: dict
+  properties:
+    triage_level:
+      type: int
+      minimum: 0
+      maximum: 5
+    reasoning:
+      type: string
+    confidence:
+      type: float
+      minimum: 0.0
+      maximum: 1.0
+observation_space:
+  type: dict
+  properties:
+    patient_id:
+      type: string
+    age:
+      type: int
+      minimum: 0
+    heart_rate:
+      type: int
+      minimum: 0
+    blood_pressure_systolic:
+      type: int
+      minimum: 0
+    blood_pressure_diastolic:
+      type: int
+      minimum: 0
+    oxygen_saturation:
+      type: float
+      minimum: 0.0
+      maximum: 100.0
+    respiratory_rate:
+      type: int
+      minimum: 0
+    temperature:
+      type: float
+      minimum: 0.0
+    pain_scale:
+      type: int
+      minimum: 0
+      maximum: 10
+    chief_complaint:
+      type: string
+    arrival_mode:
+      type: string
+    vitals_complete:
+      type: boolean
+    reward:
+      type: number
+    done:
+      type: boolean
+reward_range:
+  - 0.0
+  - 1.0
+hf_space: true
+app_port: 7860
+sdk: docker
+colorFrom: blue
+colorTo: green
+pinned: false

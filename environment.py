@@ -1,5 +1,5 @@
 """
-environment.py — PatientSimulator and ESIGrader
+environment.py — PatientSimulator
 
 PatientSimulator:
   - generate(task_name, profile_index) → PatientObservation
@@ -8,19 +8,12 @@ PatientSimulator:
   - generate_procedural(esi_level) → novel patient from distributions
   - Seeded with numpy (seed=42) for reproducibility
   - Ground truth ESI is deterministically derived from vitals, not random
-
-ESIGrader:
-  - grade(action, ground_truth_esi, step_count) → float 0.0–1.0
-  - Three-component reward: exact match + proximity + reasoning
 """
 
-import os
-import re
-import json
 import numpy as np
 from typing import Optional, Tuple, List
 
-from models import PatientObservation, TriageAction
+from models import PatientObservation
 from tasks import get_task
 from dotenv import load_dotenv
 
@@ -29,10 +22,6 @@ load_dotenv()
 
 # Seed for reproducibility as required by spec
 _rng = np.random.default_rng(42)
-
-# Counter for deterministic profile cycling across episodes
-_profile_counter: dict = {}
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Procedural Patient Generator — ESI-level distributions
@@ -192,18 +181,13 @@ class PatientSimulator:
         Returns:
           (PatientObservation, ground_truth_esi, raw_profile_dict)
 
-        profile_index: if None, cycles deterministically through profiles.
+        profile_index: if None, cycles randomly.
         """
         task = get_task(task_name)
         profiles = task["patient_profiles"]
 
         if profile_index is None:
-            # Deterministic cycling — different profile each call
-            key = task_name
-            if key not in _profile_counter:
-                _profile_counter[key] = 0
-            idx = _profile_counter[key] % len(profiles)
-            _profile_counter[key] += 1
+            idx = int(_rng.integers(0, len(profiles)))
         else:
             idx = profile_index % len(profiles)
 
@@ -294,178 +278,3 @@ class PatientSimulator:
             "vitals_complete",
         ]}
         return PatientObservation(**obs_fields)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-#  ESIGrader — reward function
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _extract_float_from_text(text: str) -> Optional[float]:
-    """
-    Robustly extract a float value from LLM output.
-    Handles common patterns like "Score: 0.8", "0.75", "The rating is 0.9/1.0".
-    """
-    # Try direct float parse first
-    text = text.strip()
-    try:
-        val = float(text)
-        return max(0.0, min(1.0, val))
-    except ValueError:
-        pass
-
-    # Regex: find patterns like 0.8, .75, 1.0
-    matches = re.findall(r'(\d*\.?\d+)', text)
-    for match in matches:
-        try:
-            val = float(match)
-            if 0.0 <= val <= 1.0:
-                return val
-        except ValueError:
-            continue
-
-    return None
-
-
-def _llm_grade_reasoning(reasoning: str) -> float:
-    """
-    Grade the clinical reasoning using an LLM via the OpenAI client.
-    Returns a float in [0.0, 1.0].
-
-    Falls back to a heuristic score if env vars are missing (e.g. local dev).
-    """
-    api_base = os.environ.get("API_BASE_URL")
-    model_name = os.environ.get("MODEL_NAME")
-    hf_token = os.environ.get("HF_TOKEN")
-
-    if not all([api_base, model_name, hf_token]):
-        # Heuristic fallback: score by reasoning length and key clinical terms
-        clinical_keywords = [
-            "esi", "vital", "bp", "blood pressure", "heart rate", "oxygen",
-            "spo2", "respiratory", "critical", "emergent", "urgent", "stable",
-            "pain", "complaint", "triage", "priority", "immediate",
-            "intervention", "life-threatening", "high-risk", "resource",
-            "temperature", "fever", "saturation", "bradycardia", "tachycardia",
-            "hypotension", "hypertension", "dyspnea", "altered mental",
-        ]
-        lower = reasoning.lower()
-        keyword_hits = sum(1 for kw in clinical_keywords if kw in lower)
-        length_score = min(len(reasoning) / 200, 1.0)
-        keyword_score = min(keyword_hits / 5, 1.0)
-        return round((length_score * 0.4 + keyword_score * 0.6), 4)
-
-    try:
-        from openai import OpenAI
-        client = OpenAI(base_url=api_base, api_key=hf_token)
-
-        grading_prompt = f"""You are a senior emergency medicine physician grading a triage reasoning.
-Score the following clinical reasoning on a scale of 0.0 to 1.0 based on:
-- Correct identification of key clinical indicators
-- Appropriate use of ESI triage criteria
-- Logical and coherent reasoning
-- Clinical accuracy
-
-Reasoning to grade:
-\"\"\"{reasoning}\"\"\"
-
-Respond with ONLY a single float number between 0.0 and 1.0. No explanation."""
-
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=[{"role": "user", "content": grading_prompt}],
-            max_tokens=10,
-            temperature=0.0,
-        )
-        score_text = response.choices[0].message.content.strip()
-        score = _extract_float_from_text(score_text)
-        if score is not None:
-            return score
-        return 0.5  # fallback
-    except Exception:
-        return 0.5
-
-
-class ESIGrader:
-    """
-    Grades a TriageAction against the ground truth ESI level.
-
-    Reward components:
-      - Exact match:  0.6 if triage_level == ground_truth_esi, else 0.0
-      - Proximity:    0.3 if |diff| == 1 (only when no exact match), else 0.0
-      - Reasoning:    LLM score * 0.4
-      - Step penalty (Hard task): -0.05 per step beyond step 1
-
-    Total is clamped to [0.0, 1.0].
-    """
-
-    @staticmethod
-    def grade(
-        action: TriageAction,
-        ground_truth_esi: int,
-        step_count: int = 1,
-    ) -> float:
-        # ── Component 1: Exact match ──
-        exact = 0.6 if action.triage_level == ground_truth_esi else 0.0
-
-        # ── Component 2: Proximity (only when no exact match) ──
-        if exact == 0.0:
-            diff = abs(action.triage_level - ground_truth_esi)
-            proximity = 0.3 if diff == 1 else 0.0
-        else:
-            proximity = 0.0
-
-        # ── Component 3: LLM reasoning score ──
-        reasoning_score = _llm_grade_reasoning(action.reasoning) * 0.4
-
-        # ── Step penalty (Hard task: decay past step 1) ──
-        step_penalty = max(0.0, (step_count - 1) * 0.05)
-
-        # BUG FIX: Use addition instead of Python `or` on floats
-        raw_reward = exact + proximity + reasoning_score - step_penalty
-        return round(max(0.001, min(0.999, raw_reward)), 4)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-#  Kendall Tau rank correlation (for Medium task)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def kendall_tau_reward(agent_ranking: list, ground_truth_ranking: list) -> float:
-    """
-    Compute normalised Kendall Tau correlation between two orderings.
-    Returns a value in [0.0, 1.0] where 1.0 = perfect agreement.
-
-    agent_ranking / ground_truth_ranking: lists of patient_id strings in order.
-    """
-    n = len(ground_truth_ranking)
-    if n == 0:
-        return 0.001
-
-    # Map ground truth IDs to positions
-    gt_pos = {pid: i for i, pid in enumerate(ground_truth_ranking)}
-
-    # Build agent positions for IDs that appear in ground truth
-    try:
-        agent_pos = [gt_pos[pid] for pid in agent_ranking if pid in gt_pos]
-    except KeyError:
-        return 0.001
-
-    if len(agent_pos) != n:
-        return 0.001
-
-    # Count concordant and discordant pairs
-    concordant = 0
-    discordant = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            if agent_pos[i] < agent_pos[j]:
-                concordant += 1
-            elif agent_pos[i] > agent_pos[j]:
-                discordant += 1
-
-    total_pairs = n * (n - 1) / 2
-    if total_pairs == 0:
-        return 0.999
-
-    tau = (concordant - discordant) / total_pairs
-    # Normalise from [-1, 1] → [0, 1]
-    raw_reward = (tau + 1) / 2
-    return round(max(0.001, min(0.999, raw_reward)), 4)
