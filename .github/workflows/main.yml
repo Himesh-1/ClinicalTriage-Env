@@ -1,0 +1,32 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Push to Hugging Face
+        run: |
+          git config --global user.email "himeshsharma107@gmail.com"
+          git config --global user.name "Himesh-01"
+
+          git clone https://huggingface.co/spaces/Himesh-01/ClinicalTriage-Env hf_space
+
+          rsync -av \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='__pycache__' \
+            --exclude='.env' \
+            ./ hf_space/
+
+          cd hf_space
+          git add .
+          git commit -m "Auto sync from GitHub" || echo "No changes"
+          git push --force https://Himesh-01:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Himesh-01/ClinicalTriage-Env main
