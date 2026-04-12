@@ -94,3 +94,17 @@ async def get_tasks():
         }
         for name in list_tasks()
     ]
+
+
+def main():
+    """Entry point for [project.scripts] and multi-mode deployment."""
+    import uvicorn
+    import os
+
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "7860"))
+    uvicorn.run("server.app:app", host=host, port=port, reload=False)
+
+
+if __name__ == "__main__":
+    main()
