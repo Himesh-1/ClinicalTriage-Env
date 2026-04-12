@@ -5,7 +5,7 @@ ClinicalTriage-Env — Hackathon Inference Script
 MANDATORY env vars:
     API_BASE_URL    LLM API endpoint            (default provided)
     MODEL_NAME      Model identifier             (default provided)
-    HF_TOKEN        HuggingFace/API key          (required, no default)
+    API_KEY         LLM API key                  (required, injected by evaluator)
     ENV_BASE_URL    Running env server URL       (default: http://localhost:7860)
     LOCAL_IMAGE_NAME Docker image name           (default: clinicaltriage-env:latest)
 
@@ -35,18 +35,19 @@ API_BASE_URL: str = os.getenv(
 MODEL_NAME: str = os.getenv(
     "MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct"
 )
-HF_TOKEN: Optional[str] = os.getenv("HF_TOKEN")
+# Priority: API_KEY (injected by evaluator) > HF_TOKEN (local/legacy)
+API_KEY: Optional[str] = os.getenv("API_KEY") or os.getenv("HF_TOKEN")
 ENV_BASE_URL: str = os.getenv("ENV_BASE_URL", "http://localhost:8000")
 LOCAL_IMAGE_NAME: str = os.getenv(
     "LOCAL_IMAGE_NAME", "clinicaltriage-env:latest"
 )
 
-if HF_TOKEN is None:
-    raise ValueError("HF_TOKEN environment variable is required")
+if API_KEY is None:
+    raise ValueError("API_KEY environment variable is required")
 
 # ── OpenAI client ─────────────────────────────────────────────────────────────
 
-client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 # ── Stdout loggers ────────────────────────────────────────────────────────────
 
