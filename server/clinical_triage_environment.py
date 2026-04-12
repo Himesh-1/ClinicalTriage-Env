@@ -83,7 +83,7 @@ class ClinicalTriageEnvironment(Environment):
             )
             if revealed_obs is not None:
                 self._current_patients[0] = revealed_obs
-                revealed_with_rewards = revealed_obs.model_copy(update={"reward": 0.0, "done": False})
+                revealed_with_rewards = revealed_obs.model_copy(update={"reward": 0.01, "done": False})
                 return revealed_with_rewards
         else:
             reward = self._rubric.grade_easy(

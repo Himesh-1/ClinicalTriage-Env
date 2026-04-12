@@ -183,7 +183,7 @@ def run_task(task_name: str) -> None:
                     _log_step(
                         step=steps_taken,
                         action=action_str,
-                        reward=0.0,
+                        reward=0.01,
                         done=False,
                         error=None,
                     )
@@ -200,11 +200,11 @@ def run_task(task_name: str) -> None:
 
             except Exception as step_exc:
                 error_msg = str(step_exc)
-                rewards.append(0.0)
+                rewards.append(0.01)
                 _log_step(
                     step=steps_taken,
                     action=action_str,
-                    reward=0.0,
+                    reward=0.01,
                     done=True,
                     error=error_msg,
                 )
@@ -223,12 +223,12 @@ def run_task(task_name: str) -> None:
         except Exception:
             pass
         if not rewards:
-            rewards = [0.0]
+            rewards = [0.01]
             steps_taken = max(steps_taken, 1)
         _log_step(
             step=steps_taken,
             action="null",
-            reward=0.0,
+            reward=0.01,
             done=True,
             error=error_msg,
         )
@@ -239,7 +239,7 @@ def run_task(task_name: str) -> None:
         _log_end(
             success=success,
             steps=steps_taken,
-            rewards=rewards if rewards else [0.0],
+            rewards=rewards if rewards else [0.01],
         )
 
 # ── Entry point ───────────────────────────────────────────────────────────────

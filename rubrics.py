@@ -149,7 +149,7 @@ class ClinicalTriageRubric:
         exact = self._exact.grade(action.triage_level, ground_truth_esi)
         prox = self._proximity.grade(action.triage_level, ground_truth_esi, exact > 0)
         reason = self._reasoning.grade(action.reasoning, skip_llm=skip_llm)
-        return round(max(0.0, min(1.0, exact + prox + reason)), 4)
+        return round(max(0.01, min(0.99, exact + prox + reason)), 4)
 
     def grade_medium(
         self,
@@ -161,9 +161,9 @@ class ClinicalTriageRubric:
         try:
             agent_ranking = json.loads(action.reasoning)
             if not isinstance(agent_ranking, list):
-                return 0.0
+                return 0.01
         except (json.JSONDecodeError, ValueError):
-            return 0.0
+            return 0.01
         gt_ranking = [
             p.patient_id
             for p in sorted(
@@ -171,7 +171,7 @@ class ClinicalTriageRubric:
                 key=lambda p: ground_truth_esis[patients.index(p)],
             )
         ]
-        return round(max(0.0, min(1.0, self._ranking.grade(agent_ranking, gt_ranking))), 4)
+        return round(max(0.01, min(0.99, self._ranking.grade(agent_ranking, gt_ranking))), 4)
 
     def grade_hard(
         self,
@@ -184,10 +184,10 @@ class ClinicalTriageRubric:
         from environment import PatientSimulator
         if action.triage_level == 0:
             revealed = PatientSimulator.reveal_vitals(raw_profile)
-            return 0.0, revealed
+            return 0.01, revealed
         exact = self._exact.grade(action.triage_level, ground_truth_esi)
         prox = self._proximity.grade(action.triage_level, ground_truth_esi, exact > 0)
         reason = self._reasoning.grade(action.reasoning, skip_llm=skip_llm)
         step_penalty = max(0.0, (step_count - 1) * 0.05)
         raw = exact + prox + reason - step_penalty
-        return round(max(0.0, min(1.0, raw)), 4), None
+        return round(max(0.01, min(0.99, raw)), 4), None
