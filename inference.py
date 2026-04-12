@@ -33,10 +33,10 @@ load_dotenv()
 API_BASE_URL = os.environ.get("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.environ.get("MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
 
-# The validator explicitly requires using the injected API_KEY
-API_KEY = os.environ.get("API_KEY") or os.environ.get("HF_TOKEN")
-if API_KEY is None:
-    raise ValueError("API_KEY environment variable is required")
+# The validator explicitly requires HF_TOKEN checking (falls back to injected API_KEY)
+HF_TOKEN = os.environ.get("HF_TOKEN") or os.environ.get("API_KEY")
+if HF_TOKEN is None:
+    raise ValueError("HF_TOKEN environment variable is required")
 
 # Speed up local grading by disabling LLM grading in the environment rubric
 os.environ["SKIP_LLM_GRADER"] = "true"
@@ -44,7 +44,7 @@ os.environ["SKIP_LLM_GRADER"] = "true"
 # ── OpenAI client ─────────────────────────────────────────────────────────────
 
 # Explicitly initialize as requested by the validator instructions
-client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
 # ── Stdout loggers ────────────────────────────────────────────────────────────
 
@@ -77,13 +77,12 @@ def _log_step(
 def _log_end(
     success: bool,
     steps: int,
-    score: float,
     rewards: list[float],
 ) -> None:
     success_str = "true" if success else "false"
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(
-        f"[END] success={success_str} steps={steps} score={score:.3f} rewards={rewards_str}",
+        f"[END] success={success_str} steps={steps} rewards={rewards_str}",
         flush=True,
     )
 
@@ -240,7 +239,6 @@ def run_task(task_name: str) -> None:
         _log_end(
             success=success,
             steps=steps_taken,
-            score=score,
             rewards=rewards if rewards else [0.0],
         )
 
